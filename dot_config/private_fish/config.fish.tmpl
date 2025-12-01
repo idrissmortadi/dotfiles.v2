@@ -10,12 +10,92 @@ starship init fish | source
 # Aliases
 alias c='clear'
 alias v='nvim'
+alias z='zoxide'
+zoxide init fish | source
 
 {{ if eq .chezmoi.hostname "COMP-G4THKNYXXN" }}
-    # Use eza on this machine
-    alias l='eza --icons -l --group-directories-first'
-    alias ll='eza --icons -la --group-directories-first'
-    alias lt='eza --icons -l --tree -L 3 --group-directories-first'
+# Use eza on this machine
+  alias l='eza --icons -l --group-directories-first'
+  alias ll='eza --icons -la --group-directories-first'
+  alias lt='eza --icons -l --tree -L 3 --group-directories-first'
+  alias k='kubectl'
+  alias lg='lazygit'
+  alias yz='yazi'
+  alias gzl='bzl run //:gazelle --'
+  alias snp='bzl run //:snapshot --'
+  alias dds='cd ~/dd/dd-source/'
+  alias dd='cd ~/dd/'
+
+  # BEGIN SCFW MANAGED BLOCK
+  alias npm="scfw run npm"
+  alias pip="scfw run pip"
+  alias poetry="scfw run poetry"
+  export SCFW_DD_AGENT_LOG_PORT="10365"
+  export SCFW_DD_LOG_LEVEL="ALLOW"
+  export SCFW_HOME="/Users/idriss.mortadi/.scfw"
+  # END SCFW MANAGED BLOCK
+
+# BEGIN ANSIBLE MANAGED BLOCK
+
+# Load homebrew shell variables
+  /opt/homebrew/bin/brew shellenv | source
+
+# Force certain more-secure behaviours from homebrew
+  set -gx HOMEBREW_NO_INSECURE_REDIRECT 1
+  set -gx HOMEBREW_CASK_OPTS --require-sha
+  set -gx HOMEBREW_DIR /opt/homebrew
+  set -gx HOMEBREW_BIN /opt/homebrew/bin
+
+# Load python shims
+  pyenv init - | source
+
+# Load ruby shims
+  rbenv init - | source
+
+# Prefer GNU binaries to Macintosh binaries
+  set -gx PATH /opt/homebrew/opt/coreutils/libexec/gnubin $PATH
+
+# Add datadog devtools binaries to the PATH
+  set -gx PATH $HOME/dd/devtools/bin $PATH
+
+# Point GOPATH to our go sources
+  set -gx GOPATH $HOME/go
+  set -gx GOPLSCACHE $HOME/.cache/gopls
+
+# Add binaries that are go install-ed to PATH
+  set -gx PATH $GOPATH/bin $PATH
+
+# Point DATADOG_ROOT to ~/dd symlink
+  set -gx DATADOG_ROOT $HOME/dd
+
+# Tell the devenv vm to mount $GOPATH/src rather than just dd-go
+  set -gx MOUNT_ALL_GO_SRC 1
+
+# store key in the login keychain instead of aws-vault managing a hidden keychain
+  set -gx AWS_VAULT_KEYCHAIN_NAME login
+
+# tweak session times
+  set -gx AWS_SESSION_TTL 24h
+  set -gx AWS_ASSUME_ROLE_TTL 1h
+
+# Helm default storage backend
+  set -gx HELM_DRIVER configmap
+
+# Go environment compatibility
+  set -gx GO111MODULE auto
+  set -gx GOPRIVATE github.com/DataDog
+  set -gx GOPROXY binaries.ddbuild.io,https://proxy.golang.org,direct
+  set -gx GONOSUMDB github.com/DataDog,go.ddbuild.io
+
+# END ANSIBLE MANAGED BLOCK
+
+# GitLab token from macOS keychain
+  set -gx GITLAB_TOKEN (security find-generic-password -a $USER -s gitlab_token -w)
+
+# gitsign include
+  if test -f ~/.config/gitsign/include.sh
+      bash ~/.config/gitsign/include.sh
+  end
 {{ else }}
     # Use exa everywhere else
     alias l='exa --icons -l --group-directories-first'
