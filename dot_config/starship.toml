@@ -2,7 +2,6 @@
 
 [character]
 disabled = false
-
 [container]
 disabled = true
 [directory]
@@ -43,3 +42,7 @@ disabled = true
 disabled = true
 [gcloud]
 disabled = true
+
+[git_metrics]
+added_style = 'bold blue'
+format = '[+$added]($added_style)/[-$deleted]($deleted_style) '
