@@ -3,7 +3,7 @@ set -euo pipefail
 
 # Packages to install
 packages=(
-    fish tmux chezmoi starship lazygit yazi bat exa fzf fd ripgrep zoxide
+    fish tmux chezmoi starship lazygit yazi bat exa fzf fd ripgrep zoxide delta tldr
 )
 
 # Install missing packages

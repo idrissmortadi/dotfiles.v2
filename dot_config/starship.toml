@@ -14,8 +14,6 @@ disabled = true
 disabled = true
 [git_status]
 disabled = true
-[git_metrics]
-disabled = true
 [hostname]
 disabled = true
 [jobs]
@@ -43,6 +41,7 @@ disabled = true
 [gcloud]
 disabled = true
 
-[git_metrics]
-added_style = 'bold blue'
-format = '[+$added]($added_style)/[-$deleted]($deleted_style) '
+# [git_metrics]
+# disabled = false
+# added_style = 'bold blue'
+# format = '[+$added]($added_style)/[-$deleted]($deleted_style) '
