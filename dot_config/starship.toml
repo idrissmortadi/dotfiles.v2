@@ -1,47 +1,71 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
-[character]
-disabled = false
-[container]
-disabled = true
-[directory]
-disabled = false
-[git_branch]
-disabled = true
-[git_commit]
-disabled = true
-[git_state]
-disabled = true
-[git_status]
-disabled = true
-[hostname]
-disabled = true
-[jobs]
-disabled = true
-[localip]
-disabled = true
-[memory_usage]
-disabled = true
-[nodejs]
-disabled = true
-[package]
-disabled = true
-[python]
-disabled = true
-[cmd_duration]
-disabled = true
-[username]
-disabled = true
-[rust]
-disabled = true
-[golang]
-disabled = true
-[aws]
-disabled = true
-[gcloud]
-disabled = true
 
-# [git_metrics]
-# disabled = false
+[python]
+disabled = false
+format = '\(( $virtualenv)\)'
+style = "green bold"
+
+# === disabled ===
+[git_metrics]
+disabled = true
 # added_style = 'bold blue'
 # format = '[+$added]($added_style)/[-$deleted]($deleted_style) '
+
+[golang]
+disabled = true
+symbol = "󰟓 "
+
+[character]
+disabled = false
+
+[container]
+disabled = true
+
+[directory]
+disabled = false
+
+[git_branch]
+disabled = true
+
+[git_commit]
+disabled = true
+
+[git_state]
+disabled = true
+
+[git_status]
+disabled = true
+
+[hostname]
+disabled = true
+
+[jobs]
+disabled = true
+
+[localip]
+disabled = true
+
+[memory_usage]
+disabled = true
+
+[nodejs]
+disabled = true
+
+[package]
+disabled = true
+
+[cmd_duration]
+disabled = true
+
+[username]
+disabled = true
+
+[rust]
+disabled = true
+
+[aws]
+disabled = true
+
+[gcloud]
+disabled = true

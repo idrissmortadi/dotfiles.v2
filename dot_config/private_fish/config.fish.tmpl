@@ -63,6 +63,9 @@ set -gx EDITOR "nvim"
     pyenv init - | source
     rbenv init - | source
 
+    # Personal Paths
+    set -gx PATH $HOME/.local/bin $PATH
+    
     # GNU coreutils first
     set -gx PATH /opt/homebrew/opt/coreutils/libexec/gnubin $PATH
 
