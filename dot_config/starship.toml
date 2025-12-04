@@ -3,12 +3,12 @@
 
 [python]
 disabled = false
-format = '\(( $virtualenv)\)'
+format = '(\( $virtualenv\))'
 style = "green bold"
 
 # === disabled ===
 [git_metrics]
-disabled = true
+disabled = false
 # added_style = 'bold blue'
 # format = '[+$added]($added_style)/[-$deleted]($deleted_style) '
 
