@@ -26,6 +26,11 @@ alias gst='git status'
 
 set -gx EDITOR "nvim"
 
+# Go paths
+set -gx GOPATH $HOME/go
+set -gx GOPLSCACHE $HOME/.cache/gopls
+set -gx PATH $GOPATH/bin $PATH
+
 
 # =========================
 #   Work-Mac Specific Block
