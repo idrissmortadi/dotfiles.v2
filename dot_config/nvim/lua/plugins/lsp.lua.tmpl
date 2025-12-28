@@ -1,5 +1,6 @@
 return {
   "neovim/nvim-lspconfig",
+{{ if eq .chezmoi.hostname "COMP-G4THKNYXXN" }}
   opts = function(_, opts)
     opts.servers = opts.servers or {}
     opts.servers.gopls = {
@@ -30,4 +31,5 @@ return {
       },
     }
   end,
+{{ end }}
 }
