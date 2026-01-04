@@ -1,7 +1,8 @@
 return {
   "neovim/nvim-lspconfig",
-{{ if eq .chezmoi.hostname "COMP-G4THKNYXXN" }}
   opts = function(_, opts)
+    opts.inlay_hints = { enabled = false }
+{{ if eq .chezmoi.hostname "COMP-G4THKNYXXN" }}
     opts.servers = opts.servers or {}
     opts.servers.gopls = {
       cmd = { "dd-gopls" },
@@ -30,6 +31,6 @@ return {
         },
       },
     }
-  end,
 {{ end }}
+  end,
 }
