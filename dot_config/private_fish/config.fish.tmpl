@@ -31,6 +31,10 @@ set -gx GOPATH $HOME/go
 set -gx GOPLSCACHE $HOME/.cache/gopls
 set -gx PATH $GOPATH/bin $PATH
 
+# =========================
+#   Fish Abreviations
+# =========================
+abbr -a gc --set-cursor 'git commit -m "%"'
 
 # =========================
 #   Work-Mac Specific Block
@@ -43,6 +47,7 @@ set -gx PATH $GOPATH/bin $PATH
     alias gzl='bzl run //:gazelle --'
     alias snp='bzl run //:snapshot --'
     alias dds='cd ~/dd/dd-source/'
+    alias ddw='cd ~/dd/dd-source.git/'
     alias dd='cd ~/dd/'
 
     # BEGIN SCFW MANAGED BLOCK
