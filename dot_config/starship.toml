@@ -8,7 +8,7 @@ style = "green bold"
 
 # === disabled ===
 [git_metrics]
-disabled = false
+disabled = true
 # added_style = 'bold blue'
 # format = '[+$added]($added_style)/[-$deleted]($deleted_style) '
 
@@ -29,13 +29,13 @@ disabled = false
 disabled = false
 
 [git_commit]
-disabled = false
+disabled = true
 
 [git_state]
-disabled = false
+disabled = true
 
 [git_status]
-disabled = false
+disabled = true
 
 [hostname]
 disabled = true

@@ -41,6 +41,9 @@ abbr -a gc --set-cursor 'git commit -m "%"'
 # =========================
 {{ if eq .chezmoi.hostname "COMP-G4THKNYXXN" }}
 
+    # Fix DNS issue
+    set -gx DDTOOL_TLS_PROBE_SLOW true
+
     alias k='kubectl'
     alias lg='lazygit'
     alias yz='yazi'
@@ -49,6 +52,8 @@ abbr -a gc --set-cursor 'git commit -m "%"'
     alias dds='cd ~/dd/dd-source/'
     alias ddw='cd ~/dd/dd-source.git/'
     alias dd='cd ~/dd/'
+
+    abbr -a task --set-cursor "git worktree add AIPSTO-% -b idriss.mortadi/aipsto-"
 
     # BEGIN SCFW MANAGED BLOCK
     alias npm="scfw run npm"
@@ -76,7 +81,8 @@ abbr -a gc --set-cursor 'git commit -m "%"'
 
     # Personal Paths
     set -gx PATH $HOME/.local/bin $PATH
-    
+    set -gx PATH $HOME/.npm-global/bin $PATH
+ 
     # GNU coreutils first
     set -gx PATH /opt/homebrew/opt/coreutils/libexec/gnubin $PATH
 
