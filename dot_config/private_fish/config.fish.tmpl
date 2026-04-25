@@ -9,7 +9,6 @@ if status is-interactive
     # Interactive commands here
 end
 
-
 # =========================
 #   Global Tools (Always)
 # =========================
@@ -23,8 +22,10 @@ alias ll='eza --icons -la --group-directories-first'
 alias lt='eza --icons -l --tree -L 3 --group-directories-first'
 
 alias gst='git status'
+alias gitw='git worktree'
+alias gd='nvim "+DiffviewOpen origin/main...HEAD --imply-local"'
 
-set -gx EDITOR "nvim"
+set -gx EDITOR nvim
 
 # Go paths
 set -gx GOPATH $HOME/go
@@ -35,6 +36,7 @@ set -gx PATH $GOPATH/bin $PATH
 #   Fish Abreviations
 # =========================
 abbr -a gc --set-cursor 'git commit -m "%"'
+abbr -a gsw --set-cursor 'git dd switch "%"'
 
 # =========================
 #   Work-Mac Specific Block
@@ -44,6 +46,13 @@ abbr -a gc --set-cursor 'git commit -m "%"'
     # Fix DNS issue
     set -gx DDTOOL_TLS_PROBE_SLOW true
 
+    # Datadog agent uses non-default APM port (Enterprise IT config)
+    set -gx DD_TRACE_AGENT_PORT 8136
+
+    alias cl='claude'
+    alias clc='claude --continue'
+    alias clr='claude --resume'
+    alias cld='claude --dangerously-skip-permissions'
     alias k='kubectl'
     alias lg='lazygit'
     alias yz='yazi'
@@ -59,8 +68,8 @@ abbr -a gc --set-cursor 'git commit -m "%"'
     alias npm="scfw run npm"
     alias pip="scfw run pip"
     alias poetry="scfw run poetry"
-    set -gx SCFW_DD_AGENT_LOG_PORT "10365"
-    set -gx SCFW_DD_LOG_LEVEL "ALLOW"
+    set -gx SCFW_DD_AGENT_LOG_PORT 10365
+    set -gx SCFW_DD_LOG_LEVEL ALLOW
     set -gx SCFW_HOME "/Users/idriss.mortadi/.scfw"
     # END SCFW MANAGED BLOCK
 
@@ -82,7 +91,7 @@ abbr -a gc --set-cursor 'git commit -m "%"'
     # Personal Paths
     set -gx PATH $HOME/.local/bin $PATH
     set -gx PATH $HOME/.npm-global/bin $PATH
- 
+
     # GNU coreutils first
     set -gx PATH /opt/homebrew/opt/coreutils/libexec/gnubin $PATH
 
@@ -123,7 +132,6 @@ abbr -a gc --set-cursor 'git commit -m "%"'
     end
 
 {{ end }}
-
 
 # =========================
 #   Machine-Agnostic PATH
