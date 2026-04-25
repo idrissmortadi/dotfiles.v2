@@ -24,3 +24,4 @@ dot_claude/usage-data
 dot_claude/settings.json.bak
 dot_claude/settings.json.orig
 dot_claude/plugins
+dot_claude/hooks/state
