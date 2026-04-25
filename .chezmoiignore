@@ -1,1 +1,26 @@
 dot_config/nvim/lazy-lock.json
+
+# Claude Code runtime data
+dot_claude/backups
+dot_claude/cache
+dot_claude/coach-reports
+dot_claude/debug
+dot_claude/file-history
+dot_claude/history.jsonl
+dot_claude/ide
+dot_claude/paste-cache
+dot_claude/plans
+dot_claude/projects
+dot_claude/scratchpad
+dot_claude/session-env
+dot_claude/sessions
+dot_claude/shell-snapshots
+dot_claude/stats-cache.json
+dot_claude/statsig
+dot_claude/tasks
+dot_claude/telemetry
+dot_claude/todos
+dot_claude/usage-data
+dot_claude/settings.json.bak
+dot_claude/settings.json.orig
+dot_claude/plugins
