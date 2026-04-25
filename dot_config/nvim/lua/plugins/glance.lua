@@ -1,10 +1,10 @@
 return {
   "dnlhc/glance.nvim",
   cmd = "Glance",
-  config = function()
-    vim.keymap.set("n", "gD", "<CMD>Glance definitions<CR>")
-    vim.keymap.set("n", "gR", "<CMD>Glance references<CR>")
-    vim.keymap.set("n", "gY", "<CMD>Glance type_definitions<CR>")
-    vim.keymap.set("n", "gM", "<CMD>Glance implementations<CR>")
-  end,
+  keys = {
+    { "gPd", "<CMD>Glance definitions<CR>", desc = "Peek definitions" },
+    { "gPr", "<CMD>Glance references<CR>", desc = "Peek references" },
+    { "gPy", "<CMD>Glance type_definitions<CR>", desc = "Peek type definitions" },
+    { "gPm", "<CMD>Glance implementations<CR>", desc = "Peek implementations" },
+  },
 }
