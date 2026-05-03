@@ -170,6 +170,7 @@
     "ask": [],
     "defaultMode": "auto"
   },
+  "model": "opus[1m]",
   "hooks": {
     "SessionStart": [
       {
@@ -217,12 +218,16 @@
     "aip-dev@datadog-claude-plugins": true
   },
   "alwaysThinkingEnabled": false,
-  "effortLevel": "medium",
+  "effortLevel": "low",
   "promptSuggestionEnabled": false,
+  "awaySummaryEnabled": false,
   "autoUpdatesChannel": "latest",
   "autoMemoryEnabled": true,
   "skipDangerousModePermissionPrompt": true,
+  "preferredNotifChannel": "ghostty",
+  "showTurnDuration": false,
+  "terminalProgressBarEnabled": false,
   "skipAutoPermissionPrompt": true,
-  "gitAttribution": false,
-  "terminalProgressBarEnabled": false
+  "useAutoModeDuringPlan": false,
+  "gitAttribution": false
 }

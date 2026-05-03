@@ -94,6 +94,7 @@ For stacked PRs (Graphite): `gt submit --draft --no-edit` to create, then `gh pr
 
 ## GitHub PR Comments
 
+- **Always draft replies first; never post unprompted.** Show every reply (review-thread reply, top-level PR comment, issue comment) as a draft block in chat before any `gh` call. Wait for explicit go-ahead per batch — "post them" / "send" / "ok" — and don't infer approval from earlier "address the feedback" / "commit" instructions, which authorize code changes only. Default mode is draft-and-wait, even in auto mode.
 - To reply to a specific review comment thread: `gh api repos/OWNER/REPO/pulls/PR/comments/COMMENT_ID/replies -f body='message'`
 - `COMMENT_ID` is the `comment_id` from the first comment in the thread (the one with `in_reply_to_id: null`)
 - This posts a reply within the existing thread, not a new top-level comment
@@ -112,6 +113,14 @@ For stacked PRs (Graphite): `gt submit --draft --no-edit` to create, then `gh pr
 
 - Generated getter methods (e.g. `GetFields()`, `GetFieldsMappings()`) handle nil receivers, so explicit nil checks before calling them are redundant. A nil map lookup in Go is also safe (returns zero value). Prefer `x.GetFoo().GetBar()` over `x != nil && x.GetFoo() != nil && x.GetFoo().GetBar()`.
 - Adding `optional` to a scalar/enum proto3 field flips its Go codegen from value to pointer. Every direct assignment (`req.Field = x`) across the repo fails to compile; every direct read in a test assertion (`req.Field`) compares pointer-vs-value. Before pushing, grep `FieldName:` assignments globally, then read field comparisons in tests, and convert both. Use `req.GetField()` for reads (handles nil), and `&x` or a local variable for writes.
+
+## Postgres upsert: distinguishing INSERT from UPDATE
+
+- **`xmax = 0` is true for freshly INSERTed rows, false for ON CONFLICT updates.** The trick for `INSERT ... ON CONFLICT DO UPDATE` when you need to know whether the row was newly created (e.g. to enforce immutable columns set only at creation): `RETURNING (xmax = 0) AS inserted, immutable_col`. Combined with a WHERE clause on the conflict branch (e.g. `WHERE owner_uuid = EXCLUDED.owner_uuid`), an empty RETURNING (`pgx.ErrNoRows`) means the row exists under a different owner — preserves the old `RowsAffected() == 0` semantic without losing the inserted/updated bit. Reuse pattern: don't update the immutable column in the ON CONFLICT branch (keeps it append-only); on subsequent saves, compare the stored value to the request and reject mismatches with `FailedPrecondition`.
+
+## Schema migrations + image-pinned test containers
+
+- **Adding a column referenced by a SELECT requires the test container schema to ship first.** dd-source's chatstore-style services run Go tests against an Alembic-built Postgres image pinned by sha. New SELECT columns fail every test in the suite with `column "X" does not exist (SQLSTATE 42703)` until the migration lands AND the image rebuilds AND the bzl values file is bumped to the new sha. Mitigation: make the new-column reference conditional on whether the request actually carries the field. Only emit `RETURNING new_col` (or include it in SELECT) when the caller sets it; defer the unconditional read-side projection to a follow-up PR after the test image picks up the migration. Same pattern for any image-pinned-schema test setup.
 
 ## grpcurl
 
@@ -145,6 +154,36 @@ For stacked PRs (Graphite): `gt submit --draft --no-edit` to create, then `gh pr
 - **`system.io.await` cannot be scoped by `postgres_cluster` tag** — it's host-level, not container-level. Filter it only by `datacenter` or `kube_cluster_name`; the `postgres_cluster` tag is not applied to it.
 - **Prefer naming-convention filters over team tags for auto-discovery.** `postgres_cluster:*-embeddings-db` catches all clusters matching the naming pattern, including ones under legacy team names (e.g. `bits-ai`). A `team:` tag filter silently misses clusters that predate the current team name. When building dashboards meant to auto-discover infrastructure, use the resource name pattern, not the team tag.
 - **Wildcard tag values work in Datadog metric queries**: `postgres_cluster:*-embeddings-db` is valid filter syntax and matches all tag values ending in `-embeddings-db`.
+
+## Claude CLI headless invocation
+
+- **`--print` buffers all output until exit** — no streaming. For live output use `--output-format stream-json --verbose`, then parse the JSON events on stdout.
+- **`stream-json` event types**: `assistant` (model text + tool calls), `result` (final, has `subtype=error` on failure), `system`/hooks (skip). Extract `message.content[].text` and `message.content[].type=="tool_use"` for meaningful display.
+- **Prompt via stdin, not positional arg** — passing the prompt as a positional arg fails with "Input must be provided through stdin" when another claude session is active. Write to stdin and close: `stdin:write(prompt, function() stdin:shutdown(function() stdin:close() end) end)`.
+- **`--no-session-persistence`** — always add this for headless invocations to avoid polluting the user's session history.
+- **Tool allowlist** — use `--allowedTools` to lock down what the headless agent can do. Enumerate exact subcommands (`Bash(git show *)`, not `Bash(git *)`), exact script paths for interpreters (`Bash(python3 /path/to/script.py *)`), not broad wildcards.
+
+## Neovim plugin testing (nvim --headless)
+
+- **No luarocks/busted needed** — use `nvim --headless -u tests/minimal_init.lua -c "luafile tests/spec.lua" -c "qa!"`. Zero dependencies beyond Neovim itself.
+- **minimal_init.lua is one line**: `vim.opt.runtimepath:prepend(vim.fn.getcwd())` — this makes `require("your_plugin")` work from the repo root.
+- **Exit code**: call `os.exit(1)` (not `vim.cmd("cquit 1")`) in the test summary on failure — `cquit` is less reliable in headless mode.
+- **getqflist filename**: `vim.fn.getqflist()` entries have `bufnr`, not `filename`. Retrieve the path with `vim.api.nvim_buf_get_name(entry.bufnr)` in tests.
+- **Makefile loop**: `for f in tests/0*_spec.lua; do nvim --headless -u tests/minimal_init.lua -c "luafile $$f" -c "qa!" 2>&1 || exit 1; done` runs all specs in order.
+- **vim.schedule in headless**: replace with a direct call `vim.schedule = function(fn) fn() end` in tests to make async callbacks synchronous.
+
+## Neovim async pipe streaming (vim.uv)
+
+- **`read_start` delivers chunks, not lines** — a single callback can contain multiple lines or a partial line. Carry a `partial` string across callbacks; only flush complete lines (split on `\n`, keep the last element as the new `partial`).
+- **`nvim_buf_set_option` is deprecated in nvim 0.12+** — use `vim.bo[bufnr].option = value` instead.
+- **Always leave a trailing blank line** in a streaming buffer so the next `set_lines(lc-1, lc, ...)` call has somewhere to replace into without off-by-one errors.
+
+## Neovim Lua + JSON
+
+- **`vim.json.decode` produces `vim.NIL` (a userdata sentinel) for JSON `null`, and `vim.NIL` is TRUTHY in Lua.** So `local x = obj.field or default` does NOT fall through when `field` is null — it returns `vim.NIL`, then any subsequent comparison (`x >= 1`, `x == nil`) raises "attempt to compare number with userdata" or behaves wrongly. Defensively coerce at the boundary: `local function num_or_nil(v) return type(v) == "number" and v or nil end` then `local n = num_or_nil(obj.field) or default`. Common offenders: GitHub PR review comments where `line: null` for outdated diff positions, and any optional field in REST/GraphQL responses.
+- **Treesitter does NOT highlight virt_lines content** — the `hl_group` you pass in each chunk segment is final. If virt_lines render in unexpected colors, the cause is almost always that your highlight group got redefined (by a colorscheme loading after your plugin), not Treesitter override. Fix by registering the highlight at module load AND on `ColorScheme` events, wrapping the latter in `vim.schedule` so it runs after the theme finishes its own `nvim_set_hl` calls.
+- **Lua patterns operate on bytes, not codepoints.** `─+` (or any other UTF-8 box-drawing/emoji character followed by `+`) appears to work because the byte sequence happens to repeat cleanly, but you're matching "one-or-more of these exact 3 bytes" — fragile if the sequence ever appears partial or is interleaved. To assert "this string is a run of `─` chars," use `s:gsub("─", "") == ""` instead of regex. Same for any multi-byte char in any pattern.
+- **`nvim_buf_set_lines` rejects ANY string containing `\n` or `\r`** — even if you meant the `\n` to be a literal escape. `string.format("%q", body)` does NOT save you: if `body` already contains real newline bytes, `%q` preserves them. Always pre-strip with `gsub("[\r\n]+", " ")` (or split into multiple lines) before passing to `nvim_buf_set_lines`. Common trap: dumping JSON-decoded review-comment bodies to a scratch buffer.
 
 ## Long-Term Memory
 
